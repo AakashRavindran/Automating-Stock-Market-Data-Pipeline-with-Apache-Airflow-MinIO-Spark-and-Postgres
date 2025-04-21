@@ -1,12 +1,14 @@
 Overview
 ========
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+This project retrieves stock prices from the Yahoo Finance website using an API, processes and stores this data, and finally loads it into a data warehouse for analytics and visualization. Additionally, a notification is sent to Slack whenever a task is successfully completed
+
+This project is inspired by a course I took on Udemy, taught by Marc Lamberti. The project helped me understand how to manage and automate data pipelines using industry-standard tools.
 
 Project Contents
 ================
 
-Your Astro project contains the following files and folders:
+The astro project contains the following files and folders:
 
 - dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
     - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
@@ -46,3 +48,31 @@ Contact
 =======
 
 The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+
+
+Step-by-Step Breakdown
+=======================
+
+1. Checking if Yahoo API is Available
+The process starts by checking if Yahoo Finance API is available using the is_api_available() function. If the API is online, the data retrieval process starts.
+
+2. Fetching Stock Prices
+Once we ensure the API is available, the next step is to use the fetch_stock_prices() function to pull stock price data. The prices are retrieved from the Yahoo Finance website for specific stocks (which can be configured).
+
+3. Storing Data in MinIO
+After fetching the stock prices, they are stored in MinIO, an S3-compatible object storage. This ensures we have a reliable and scalable storage solution that can handle large amounts of data.
+
+4. Data Transformation with Spark
+Once the stock data is stored, Apache Spark comes into play. We use Spark to format the data and perform any necessary transformations before loading it into Postgres.
+
+5. Loading Data to Postgres
+After processing, the formatted stock prices are loaded into Postgres for further analysis or visualization.
+
+6. Notifications via Slack
+Whenever the pipeline finishes a task, we notify a Slack channel using Airflow’s Slack integration. This helps keep track of the workflow and identify if anything goes wrong.
+
+7.Monitoring with Metabase
+To visualize the stock price data, I’ve connected the Postgres database to Metabase, an open-source business intelligence tool. Metabase allows you to create dashboards and get insights from the stock price data easily.
+
+
+Credits to Marc Lamberti’s course on Udemy for inspiring this project
